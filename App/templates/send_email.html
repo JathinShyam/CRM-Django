@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Send Email</h1>
+<br/>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="id_subject">Subject:</label>
+        <input type="text" id="id_subject" name="subject" class="form-control" required>
+        <br>
+<br/>
+        <label for="id_body">Body:</label>
+        <textarea id="id_body" name="body" class="form-control" required></textarea>
+        <br>
+<br/>
+{#        <label for="id_recipient_email">Recipient Email:</label>#}
+{#        <input type="email" id="id_recipient_email" name="recipient_email" class="form-control" required>#}
+{#        <br>#}
+{#<br/>#}
+
+        <label for="{{ form.recipient_email.id_for_label }}">Recipient Email(s) (comma-separated):</label>
+        <input type="text" name="recipient_email" id="{{ form.recipient_email.id_for_label }}" value="{{ form.recipient_email.value }}" class="form-control" required>
+        <br>
+
+        <label for="id_attachment">Attachment (optional):</label>
+        <input type="file" id="id_attachment" name="attachment">
+        <br>
+<br/>
+        <button type="submit">Send Email</button>
+    </form>
+
+{% endblock %}

@@ -11,6 +11,7 @@ urlpatterns = [
     path('delete_record/<int:pk>', views.delete_record, name='delete_record'),
     path('add_record/', views.add_record, name='add_record'),
     path('update_record/<int:pk>', views.update_record, name='update_record'),
-    # path('send_email/<int:pk>', views.send_email, name='send_email),
+    path('send_email/', views.send_email, name='send_email'),
+    path('import_csv/', views.import_csv, name='import_csv'),
 
 ]

@@ -71,3 +71,22 @@ class AddRecordForm(forms.ModelForm):
     class Meta:
         model = Record
         exclude = ("user",)
+
+
+class SendEmailForm(forms.Form):
+    subject = forms.CharField(max_length=100, required=True, label="Subject")
+    body = forms.CharField(widget=forms.Textarea, required=True, label="Body")
+    recipient_email = forms.CharField(required=True, label="Recipient Email")
+    attachment = forms.FileField(required=False, label="Attachment")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        attachment = cleaned_data.get("attachment")
+
+        # Ensure that the attached file is not too large
+        if attachment:
+            max_size = 15 * 1024 * 1024  # 15 MB (adjust as needed)
+            if attachment.size > max_size:
+                raise forms.ValidationError("The attached file is too large. Maximum size is 5 MB.")
+
+        return cleaned_data

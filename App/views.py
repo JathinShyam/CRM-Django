@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm
+from .forms import SignUpForm, AddRecordForm, SendEmailForm
 from .models import Record
+import csv
+from django.core.mail import EmailMessage
+from django.conf import settings
+import os
 
 
 def home(request):
@@ -98,5 +102,85 @@ def update_record(request, pk):
         return redirect('home')
 
 
-def send_email(request, pk):
-    pass
+# def send_email(request, pk):
+#     pass
+
+
+def import_csv(request):
+    if request.user.is_authenticated:
+        if request.method == "POST" and request.FILES['csv_file']:
+            csv_file = request.FILES['csv_file']
+
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, 'Please upload a CSV file.')
+                return redirect('import_csv')  # Redirect back to the import page with an error message
+
+            try:
+                # Read the CSV file
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                csv_reader = csv.DictReader(decoded_file)
+
+                # Loop through each row and save it to the 'Record' model
+                for row in csv_reader:
+                    new_record = Record(
+                        first_name=row['first_name'],
+                        last_name=row['last_name'],
+                        email=row['email'],
+                        phone=row['phone'],
+                        address=row['address'],
+                        city=row['city'],
+                        state=row['state'],
+                        pincode=row['pincode']
+                    )
+                    new_record.save()
+
+                messages.success(request, 'CSV file uploaded and data saved successfully.')
+                return redirect('import_csv')  # Redirect back to the import page with a success message
+
+            except Exception as e:
+                messages.error(request, f'Error processing CSV file: {e}')
+                return redirect('import_csv')  # Redirect back to the import page with an error message
+
+        return render(request, 'import_csv.html')
+
+    else:
+        messages.success(request, "You Must Be Logged In To Do That...")
+        return redirect('home')
+
+
+def send_email(request):
+    if request.method == "POST":
+        form = SendEmailForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            body = form.cleaned_data['body']
+            recipient_emails = form.cleaned_data['recipient_email']
+            attachment = request.FILES.get('attachment')
+
+            try:
+                # Split the input string of email addresses into a list
+                recipient_email_list = [email.strip() for email in recipient_emails.split(',')]
+
+                # Create an EmailMessage object for each recipient
+                for recipient_email in recipient_email_list:
+                    email = EmailMessage(subject, body, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+
+                    # Attach a file if provided
+                    if attachment:
+                        email.attach(attachment.name, attachment.read(), attachment.content_type)
+
+                    # Send the email
+                    email.send()
+
+                messages.success(request, 'Email(s) sent successfully.')
+                return redirect('send_email')  # Redirect back to the email form with a success message
+
+            except Exception as e:
+                messages.error(request, f'Error sending email: {e}')
+                return redirect('send_email')  # Redirect back to the email form with an error message
+
+    else:
+        form = SendEmailForm()
+
+    return render(request, 'send_email.html', {'form': form})
