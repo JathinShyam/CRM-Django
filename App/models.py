@@ -10,7 +10,7 @@ class Record(models.Model):
     address = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
-    pincode = models.IntegerField(max_length=20)
+    pincode = models.IntegerField()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

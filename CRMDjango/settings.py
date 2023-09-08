@@ -1,22 +1,22 @@
-
-
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-mky=ilu0!j-^@^6vk+ul@5u6j1zuf8$d+=v0np#(nk_c&z0a%$"
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "App",
+    'login_history',
 ]
 
 MIDDLEWARE = [
@@ -61,21 +62,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "CRMDjango.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "CRM",
-        "USER" : "root",
-        "PASSWORD" : "1102",
-        "HOST" : "localhost",
-        "PORT" : "3306",
+        "NAME": os.environ.get('NAME'),
+        "USER": os.environ.get('USER'),
+        "PASSWORD": os.environ.get('PASSWORD'),
+        "HOST": "localhost",
+        "PORT": "3306",
 
     }
 }
+
 
 
 # Password validation
@@ -96,7 +97,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -107,7 +107,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -123,5 +122,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Gmail SMTP server
 EMAIL_PORT = 587  # The default SMTP port for TLS
 EMAIL_USE_TLS = True  # Use TLS for secure communication
-EMAIL_HOST_USER = 'newtestcase101@gmail.com'  # Your Gmail email address
-EMAIL_HOST_PASSWORD = 'ikryrvolxedhysfi'  # Generate an app password from your Google Account settings
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')  # Your Gmail email address
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # Generate an app password from your Google Account settings
