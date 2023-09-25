@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, SendEmailForm
+from .forms import SignUpForm, AddRecordForm, SendEmailForm, SearchForm
 from .models import Record
 import csv
 from django.core.mail import EmailMessage
 from django.conf import settings
 import os
+from django.db.models import Q
 
 
 def home(request):
@@ -184,3 +185,28 @@ def send_email(request):
         form = SendEmailForm()
 
     return render(request, 'send_email.html', {'form': form})
+
+
+
+def search_results(request):
+    if request.method == 'GET':
+        form = SearchForm(request.GET)
+        if form.is_valid():
+
+            # search_query = form.cleaned_data.get('search_query')
+            search_query = request.GET.get('search_query', '')
+            # Use filter() to find records where 'first_name' starts with the search query
+            records = Record.objects.filter(Q(first_name__startswith=search_query) | 
+                                            Q(last_name__startswith=search_query))
+        else:
+            records = Record.objects.all()
+    else:
+        records = Record.objects.all()
+        form = SearchForm()
+
+    context = {
+        'records': records,
+    }
+
+    return render(request, 'search_results.html', context)
+

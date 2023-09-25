@@ -90,3 +90,18 @@ class SendEmailForm(forms.Form):
                 raise forms.ValidationError("The attached file is too large. Maximum size is 5 MB.")
 
         return cleaned_data
+    
+    # forms.py
+
+
+class SearchForm(forms.Form):
+    search_query = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            'type': 'search',
+            'placeholder': 'Search',
+            'aria-label': 'Search'
+        })
+    )

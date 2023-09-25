@@ -13,5 +13,6 @@ urlpatterns = [
     path('update_record/<int:pk>', views.update_record, name='update_record'),
     path('send_email/', views.send_email, name='send_email'),
     path('import_csv/', views.import_csv, name='import_csv'),
+    path('search/', views.search_results, name='search_results'),
 
 ]
