@@ -23,18 +23,18 @@
   </thead>
   <tbody>
     
-{% if records %}
-	{% for record in records %}
+{% if customers %}
+	{% for customer in customers %}
 		<tr>
-			<td>{{ record.first_name }} {{ record.last_name }}</td>
-			<td>{{ record.email }}</td>
-			<td>{{ record.phone }}</td>
-			<td>{{ record.address }}</td>
-			<td>{{ record.city }}</td>
-			<td>{{ record.state }}</td>
-			<td>{{ record.pincode}}</td>
-			<td>{{ record.created_at }}</td>
-			<td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
+			<td>{{ customer.first_name }} {{ customer.last_name }}</td>
+			<td>{{ customer.email }}</td>
+			<td>{{ customer.phone }}</td>
+			<td>{{ customer.address }}</td>
+			<td>{{ customer.city }}</td>
+			<td>{{ customer.state }}</td>
+			<td>{{ customer.pincode}}</td>
+			<td>{{ customer.created_at }}</td>
+			<td><a href="{% url 'customer' customer_record.id %}">{{ customer.id }}</a></td>
 		</tr>
 	{% endfor %}
 

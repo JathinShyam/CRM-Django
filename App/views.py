@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, SendEmailForm, SearchForm
-from .models import Record
+from .forms import SignUpForm, AddCustomerForm, SendEmailForm, SearchForm
+from .models import Customer
 import csv
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -11,7 +11,7 @@ from django.db.models import Q
 
 
 def home(request):
-    records = Record.objects.all()
+    customers = Customer.objects.all()
     # Check to see if logging in
     if request.method == 'POST':
         username = request.POST['username']
@@ -26,7 +26,7 @@ def home(request):
             messages.success(request, "There Was An Error Logging In, Please Try Again...")
             return redirect('home')
     else:
-        return render(request, 'home.html', {'records': records})
+        return render(request, 'home.html', {'customers': customers})
 
 
 def logout_user(request):
@@ -56,48 +56,48 @@ def register_user(request):
 
 def customer_record(request, pk):
     if request.user.is_authenticated:
-        # Look Up Records
-        customer_record = Record.objects.get(id=pk)
-        return render(request, 'record.html', {'customer_record': customer_record})
+        # Look Up Customers
+        customer_record = Customer.objects.get(id=pk)
+        return render(request, 'customer.html', {'customer_record': customer_record})
     else:
         messages.success(request, "You Must Be Logged In To View That Page...")
         return redirect('home')
 
 
-def delete_record(request, pk):
+def delete_customer(request, pk):
     if request.user.is_authenticated:
-        delete_it = Record.objects.get(id=pk)
+        delete_it = Customer.objects.get(id=pk)
         delete_it.delete()
-        messages.success(request, "Record Deleted Successfully...")
+        messages.success(request, "Customer Deleted Successfully...")
         return redirect('home')
     else:
         messages.success(request, "You Must Be Logged In To Do That...")
         return redirect('home')
 
 
-def add_record(request):
-    form = AddRecordForm(request.POST or None)
+def add_customer(request):
+    form = AddCustomerForm(request.POST or None)
     if request.user.is_authenticated:
         if request.method == "POST":
             if form.is_valid():
-                add_record = form.save()
-                messages.success(request, "Record Added...")
+                add_customer = form.save()
+                messages.success(request, "Customer Added...")
                 return redirect('home')
-        return render(request, 'add_record.html', {'form': form})
+        return render(request, 'add_customer.html', {'form': form})
     else:
         messages.success(request, "You Must Be Logged In...")
         return redirect('home')
 
 
-def update_record(request, pk):
+def update_customer(request, pk):
     if request.user.is_authenticated:
-        current_record = Record.objects.get(id=pk)
-        form = AddRecordForm(request.POST or None, instance=current_record)
+        current_customer = Customer.objects.get(id=pk)
+        form = AddCustomerForm(request.POST or None, instance=current_customer)
         if form.is_valid():
             form.save()
-            messages.success(request, "Record Has Been Updated!")
+            messages.success(request, "Customer Has Been Updated!")
             return redirect('home')
-        return render(request, 'update_record.html', {'form': form})
+        return render(request, 'update_customer.html', {'form': form})
     else:
         messages.success(request, "You Must Be Logged In...")
         return redirect('home')
@@ -121,9 +121,9 @@ def import_csv(request):
                 decoded_file = csv_file.read().decode('utf-8').splitlines()
                 csv_reader = csv.DictReader(decoded_file)
 
-                # Loop through each row and save it to the 'Record' model
+                # Loop through each row and save it to the 'Customer' model
                 for row in csv_reader:
-                    new_record = Record(
+                    new_customer = Customer(
                         first_name=row['first_name'],
                         last_name=row['last_name'],
                         email=row['email'],
@@ -133,7 +133,7 @@ def import_csv(request):
                         state=row['state'],
                         pincode=row['pincode']
                     )
-                    new_record.save()
+                    new_customer.save()
 
                 messages.success(request, 'CSV file uploaded and data saved successfully.')
                 return redirect('import_csv')  # Redirect back to the import page with a success message
@@ -195,17 +195,17 @@ def search_results(request):
 
             # search_query = form.cleaned_data.get('search_query')
             search_query = request.GET.get('search_query', '')
-            # Use filter() to find records where 'first_name' starts with the search query
-            records = Record.objects.filter(Q(first_name__startswith=search_query) | 
+            # Use filter() to find customers where 'first_name' starts with the search query
+            customers = Customer.objects.filter(Q(first_name__startswith=search_query) | 
                                             Q(last_name__startswith=search_query))
         else:
-            records = Record.objects.all()
+            customers = Customer.objects.all()
     else:
-        records = Record.objects.all()
+        customers = Customer.objects.all()
         form = SearchForm()
 
     context = {
-        'records': records,
+        'customers': customers,
     }
 
     return render(request, 'search_results.html', context)

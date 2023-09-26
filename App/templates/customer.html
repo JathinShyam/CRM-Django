@@ -11,7 +11,6 @@
   <div class="card-body">
 
 
-
 <p class="card-text">
 <strong>Email: </strong>{{ customer_record.email }}</p>
 
@@ -44,9 +43,10 @@
 <br/><br/>
 <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
 
-<a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'delete_customer' customer_record.id %}" class="btn btn-danger">Delete</a>
 
-<a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Update Record</a>
+<a href="{% url 'update_customer' customer_record.id %}" class="btn btn-secondary">Update Record</a>
+
 		
 
 {% endblock %}

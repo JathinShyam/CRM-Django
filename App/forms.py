@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Record
+from .models import Customer
 
 
 class SignUpForm(UserCreationForm):
@@ -43,8 +43,8 @@ class SignUpForm(UserCreationForm):
                                       'for verification.</small></span>')
 
 
-# Create Add Record Form
-class AddRecordForm(forms.ModelForm):
+# Create Add Customer Form
+class AddCustomerForm(forms.ModelForm):
     first_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
         attrs={"placeholder": "First Name", "class": "form-control"}), label="")
     last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(
@@ -69,7 +69,7 @@ class AddRecordForm(forms.ModelForm):
                               label="")
 
     class Meta:
-        model = Record
+        model = Customer
         exclude = ("user",)
 
 
