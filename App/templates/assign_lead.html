@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1>Assign Lead to Query</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="query_id">Select Query:</label>
+        <select id="query_id" name="query_id">
+            {% for query in queries %}
+                <option value="{{ query.id }}">{{ query.query_text }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="lead_id">Select Lead:</label>
+        <select id="lead_id" name="lead_id">
+            {% for lead in leads %}
+                <option value="{{ lead.id }}">{{ lead.full_name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Assign Lead</button>
+    </form>
+
+{% endblock %}

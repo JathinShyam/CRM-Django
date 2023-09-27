@@ -1,17 +1,41 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddCustomerForm, SendEmailForm, SearchForm
-from .models import Customer
+from .forms import SignUpForm, AddCustomerForm, SendEmailForm, SearchForm, CustomerQueryForm
+from .models import *
 import csv
 from django.core.mail import EmailMessage
 from django.conf import settings
 import os
 from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import get_user_model
 
 
 def home(request):
-    customers = Customer.objects.all()
+    # customers = Customer.objects.all()
+
+    # Retrieve all customer records
+    customer_query = Customer.objects.all()
+
+    # Create a Paginator instance with 15 records per page
+    paginator = Paginator(customer_query, 15)
+
+    # Get the current page number from the request's GET parameters
+    page = request.GET.get('page')
+
+    try:
+        customers = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver the first page.
+        customers = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g., 9999), deliver the last page of results.
+        customers = paginator.page(paginator.num_pages)
+
+
     # Check to see if logging in
     if request.method == 'POST':
         username = request.POST['username']
@@ -210,3 +234,46 @@ def search_results(request):
 
     return render(request, 'search_results.html', context)
 
+
+def submit_query(request):
+    if request.method == 'POST':
+        form = CustomerQueryForm(request.POST)
+        if form.is_valid():
+            # Create a new CustomerQuery instance
+            customer_query = form.save(commit=False)  # Create but don't save yet
+            customer_query.resolved = False  # Set initial query status
+            customer_query.save()  # Save the query
+            messages.success(request, "Query submitted successfully!")
+            return redirect('submit_query')  # Redirect to the query submission page
+    else:
+        form = CustomerQueryForm()
+
+    return render(request, 'submit_query.html', {'form': form})
+
+
+@login_required
+@user_passes_test(lambda user: user.is_superuser or not hasattr(user, 'lead'))
+def view_queries(request):
+    queries = CustomerQuery.objects.all()
+
+    return render(request, 'view_queries.html', {'queries': queries})
+
+
+def assign_lead(request):
+    if request.method == 'POST':
+        query_id = request.POST.get('query_id')
+        lead_id = request.POST.get('lead_id')
+        try:
+            query = CustomerQuery.objects.get(id=query_id)
+            lead = Lead.objects.get(id=lead_id)
+            query.lead_assigned = lead
+            query.save()
+            messages.success(request, "Query assigned to the lead successfully!")
+        except (CustomerQuery.DoesNotExist, Lead.DoesNotExist):
+            messages.error(request, "Query or lead not found. Assignment failed.")
+    else:
+        # Fetch the list of leads to display in the assignment form
+        leads = Lead.objects.all()
+        return render(request, 'assign_lead.html', {'leads': leads})
+
+    return redirect('view_queries')  # Redirect to the list of assigned queries

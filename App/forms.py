@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Customer
+from .models import *
 
 
 class SignUpForm(UserCreationForm):
@@ -105,3 +105,9 @@ class SearchForm(forms.Form):
             'aria-label': 'Search'
         })
     )
+
+
+class CustomerQueryForm(forms.ModelForm):
+    class Meta:
+        model = CustomerQuery
+        fields = ['customer', 'query_text']

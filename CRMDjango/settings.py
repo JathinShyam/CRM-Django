@@ -78,6 +78,10 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Use Django's default authentication
+    # Add any additional authentication backends as needed
+]
 
 
 # Password validation

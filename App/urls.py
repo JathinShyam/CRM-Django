@@ -14,5 +14,8 @@ urlpatterns = [
     path('send_email/', views.send_email, name='send_email'),
     path('import_csv/', views.import_csv, name='import_csv'),
     path('search/', views.search_results, name='search_results'),
+    path('submit_query/', views.submit_query, name='submit_query'),
+    path('view_queries/', views.view_queries, name='view_queries'),
+    path('assign_lead/', views.assign_lead, name='assign_lead'),
 
 ]

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Assigned Queries</h1>
+    <ul>
+        {% for query in queries %}
+            <li>{{ query.query_text }} - Assigned to: {{ query.lead_assigned.full_name }} - Resolved: {% if query.resolved %}Yes{% else %}No{% endif %}</li>
+        {% empty %}
+            <li>No queries assigned.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
