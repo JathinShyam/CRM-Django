@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h1>Assign Employee to Query</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Assign">
+    </form>
+</br>
+    <a href="{% url 'view_queries' %}" class="btn btn-secondary">Back to Query List</a>
+
+{% endblock %}

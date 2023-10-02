@@ -20,35 +20,19 @@
                 <a class="nav-link" href="{% url 'send_email' %}">Send E-Mail</a>
             </li>
 
-            
-
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'submit_query' %}">Submit Query</a>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'view_queries' %}">View Query</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'view_queries' %}">View Query</a>
-        </li>
-
-
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'assign_lead' %}">Assign Lead</a>
-      </li>
+            <a class="nav-link" href="{% url 'assign_employee' %}">Assign Employee</a>
+          </li>
       
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-    </li>
-
-
-
-
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
 
             </ul>
-            <!-- <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-             -->
             <form class="d-flex" role="search" method="GET" action="{% url 'search_results' %}">
               <input class="form-control me-2" type="search" name="search_query" placeholder="Search" aria-label="Search">
               <!-- {{ form.search_query }} -->
@@ -56,13 +40,19 @@
           </form>
 
         <ul>
+
+
         {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'register' %}">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'home' %}">Login</a>
-        </li>        
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'submit_query' %}">Submit Query</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">Login</a>
+          </li>        
         {% endif %}
         
         

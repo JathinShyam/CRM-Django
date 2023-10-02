@@ -110,4 +110,13 @@ class SearchForm(forms.Form):
 class CustomerQueryForm(forms.ModelForm):
     class Meta:
         model = CustomerQuery
-        fields = ['customer', 'query_text']
+        fields = ['customer', 'query', 'query_text']
+        widgets = {
+            # 'customer': forms.HiddenInput(),
+            'query': forms.Select(attrs={'class': 'form-control'}),
+            'query_text': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+class AssignEmployeeForm(forms.Form):
+    query = forms.ModelChoiceField(queryset=CustomerQuery.objects.all(), empty_label="Select Query")
+    employee = forms.ModelChoiceField(queryset=Employee.objects.all(), empty_label="Select Employee")

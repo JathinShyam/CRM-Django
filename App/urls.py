@@ -16,6 +16,6 @@ urlpatterns = [
     path('search/', views.search_results, name='search_results'),
     path('submit_query/', views.submit_query, name='submit_query'),
     path('view_queries/', views.view_queries, name='view_queries'),
-    path('assign_lead/', views.assign_lead, name='assign_lead'),
+    path('assign_employee/', views.assign_employee, name='assign_employee'),
 
 ]

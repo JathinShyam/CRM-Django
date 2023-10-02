@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddCustomerForm, SendEmailForm, SearchForm, CustomerQueryForm
+from .forms import SignUpForm, AddCustomerForm, SendEmailForm, SearchForm, CustomerQueryForm, AssignEmployeeForm
 from .models import *
 import csv
 from django.core.mail import EmailMessage
@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import get_user_model
-
+import random
 
 def home(request):
     # customers = Customer.objects.all()
@@ -217,7 +217,6 @@ def search_results(request):
         form = SearchForm(request.GET)
         if form.is_valid():
 
-            # search_query = form.cleaned_data.get('search_query')
             search_query = request.GET.get('search_query', '')
             # Use filter() to find customers where 'first_name' starts with the search query
             customers = Customer.objects.filter(Q(first_name__startswith=search_query) | 
@@ -235,12 +234,37 @@ def search_results(request):
     return render(request, 'search_results.html', context)
 
 
+def assignEmployee(query:str) -> str:
+    if query == "Account Management" or query == "General Inquiries":
+        return "Customer Support Representative"
+    elif query == "Product Inquiries":
+        return "Product Specialist"
+    elif query == "Order Status and Tracking":
+        return "Logistics Coordinator"
+    elif query == "Complaints" or query == "Feedback and Suggestions":
+        return "Lead"
+    elif query == "Returns and Refunds" or query == "Technical Support":
+        return "IT Support Technician"
+    elif query == "Payment Issues":
+        return "Financial Analyst"
+    elif query == "Offers and Promotions":
+        return "Marketing Coordinator"
+    
+
 def submit_query(request):
     if request.method == 'POST':
         form = CustomerQueryForm(request.POST)
         if form.is_valid():
             # Create a new CustomerQuery instance
-            customer_query = form.save(commit=False)  # Create but don't save yet
+            # customer_query = form.save(commit=False) # Create but don't save yet
+            customer_query = CustomerQuery()
+            customer_query.customer = form.cleaned_data['customer']
+            customer_query.query = form.cleaned_data['query']
+            customer_query.query_text = form.cleaned_data['query_text']
+            employee_type = assignEmployee(customer_query.query)
+            employees = Employee.objects.filter(designation=employee_type)
+            if employees:
+                customer_query.employee_assigned = random.choice(employees)
             customer_query.resolved = False  # Set initial query status
             customer_query.save()  # Save the query
             messages.success(request, "Query submitted successfully!")
@@ -252,28 +276,25 @@ def submit_query(request):
 
 
 @login_required
-@user_passes_test(lambda user: user.is_superuser or not hasattr(user, 'lead'))
+@user_passes_test(lambda user: user.is_superuser or not hasattr(user, 'Employee'))
 def view_queries(request):
     queries = CustomerQuery.objects.all()
 
     return render(request, 'view_queries.html', {'queries': queries})
 
 
-def assign_lead(request):
+def assign_employee(request):
+    employees = Employee.objects.all()
     if request.method == 'POST':
-        query_id = request.POST.get('query_id')
-        lead_id = request.POST.get('lead_id')
-        try:
-            query = CustomerQuery.objects.get(id=query_id)
-            lead = Lead.objects.get(id=lead_id)
-            query.lead_assigned = lead
+        form = AssignEmployeeForm(request.POST)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            employee = form.cleaned_data['employee']
+            query.employee_assigned = employee
             query.save()
-            messages.success(request, "Query assigned to the lead successfully!")
-        except (CustomerQuery.DoesNotExist, Lead.DoesNotExist):
-            messages.error(request, "Query or lead not found. Assignment failed.")
+            messages.success(request, "Query assigned to the Employee successfully!")
     else:
         # Fetch the list of leads to display in the assignment form
-        leads = Lead.objects.all()
-        return render(request, 'assign_lead.html', {'leads': leads})
-
-    return redirect('view_queries')  # Redirect to the list of assigned queries
+        form = AssignEmployeeForm()
+        
+    return render(request, 'assign_employee.html', {'form': form, 'employees': employees})
