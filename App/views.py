@@ -127,10 +127,6 @@ def update_customer(request, pk):
         return redirect('home')
 
 
-# def send_email(request, pk):
-#     pass
-
-
 def import_csv(request):
     if request.user.is_authenticated:
         if request.method == "POST" and request.FILES['csv_file']:
